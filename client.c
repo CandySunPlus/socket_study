@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     }
 
     // 1) init socket
-    if ((sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP) < 0)) {
+    if ((sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP))< 0) {
         perror("socket error");
         exit(1);
     }
