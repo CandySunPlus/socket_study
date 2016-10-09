@@ -1,7 +1,4 @@
 .idea
 .DS_Store
-CMakeFiles
-*.cmake
-CMakeCache.txt
-Makefile
 __pycache__
+build
