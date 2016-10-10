@@ -1,4 +1,4 @@
 cmake_minimum_required (VERSION 2.8)
-project (demo)
-add_executable (client client.c config.h)
-add_executable (server server.c config.h)
+project (socket)
+add_executable (process_cli ./src/process/client.c ./src/config.h)
+add_executable (process_serv ./src/process/server.c ./src/config.h)

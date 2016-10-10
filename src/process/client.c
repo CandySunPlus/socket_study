@@ -1,4 +1,4 @@
-#include "config.h"
+#include "../config.h"
 
 ssize_t readline(int fd, char *ptr_v, ssize_t maxlen) {
     ssize_t length, rc;

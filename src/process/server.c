@@ -1,4 +1,4 @@
-#include "config.h"
+#include "../config.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
             close(listen_fd);
             ssize_t n;
             char buff[MAX_LINE];
-            printf("accept new client: %s\n", inet_ntoa(client_addr.sin_addr));
+            printf("accept new client: %s:%d\n", inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
             while ((n = read(conn_fd, buff, MAX_LINE)) > 0) {
                 write(conn_fd, buff, n);
             }
