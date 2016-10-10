@@ -45,9 +45,11 @@ int main(int argc, char *argv[])
         }
 
         if ((child_pid = fork()) == 0) {
+            // 子进程关闭监听句柄
             close(listen_fd);
             ssize_t n;
             char buff[MAX_LINE];
+            printf("accept new client: %s\n", inet_ntoa(client_addr.sin_addr));
             while ((n = read(conn_fd, buff, MAX_LINE)) > 0) {
                 write(conn_fd, buff, n);
             }
