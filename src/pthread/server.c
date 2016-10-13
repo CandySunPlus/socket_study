@@ -19,7 +19,7 @@ void* recv_message(void *fd) {
 
 int main(int argc, char *argv[])
 {
-    int listen_fd, conn_fd;
+    int listen_fd, conn_fd, opt = 1;
     socklen_t client_addr_len;
     // 线程ID
     pthread_t recv_tid, send_tid;
@@ -32,11 +32,18 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    // set socket reuse address
+    if(setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("socket set error");
+        exit(1);
+    }
+
     // 2) init server address
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
 
     // 3) bind socket
     if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
