@@ -17,7 +17,7 @@ int recv_message(void *fd) {
 
 int main(int argc, char *argv[])
 {
-    int socket_fd, conn_fd, client_fds[FD_SETSIZE], maxfd, reval;
+    int flags, socket_fd, conn_fd, client_fds[FD_SETSIZE], maxfd, reval, on = 1;
     socklen_t client_len;
     struct sockaddr_in client_addr, server_addr;
     fd_set fds;
@@ -28,6 +28,22 @@ int main(int argc, char *argv[])
     // 1) create socket
     if ((socket_fd = maxfd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
         perror("socket error");
+        exit(1);
+    }
+
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+        perror("setsocketopt error");
+        exit(1);
+    }
+
+    // set socket with non block
+    if ((flags = fcntl(socket_fd, F_GETFL)) < 0) {
+        perror("F_GETFL error");
+        exit(1);
+    }
+
+    if (fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+        perror("F_SETFL error");
         exit(1);
     }
 
@@ -70,7 +86,6 @@ int main(int argc, char *argv[])
             perror("select error");
             exit(1);
         } else if (reval == 0) {
-            printf("select is timeout\n");
             continue;
         }
 
@@ -93,20 +108,20 @@ int main(int argc, char *argv[])
                 printf("too many clients.\n");
                 exit(1);
             }
-        } else {
-            for (int i = 0; i < FD_SETSIZE; i ++) {
-                conn_fd = client_fds[i];
-                if (conn_fd < 0) {
-                    continue;
-                }
+        }
 
-                if (FD_ISSET(conn_fd, &fds)) {
-                    if (recv_message(&conn_fd) < 0) {
-                        FD_CLR(conn_fd, &fds);
-                        close(conn_fd);
-                        client_fds[i] = -1;
-                        continue;
-                    }
+        for (int i = 0; i < FD_SETSIZE; i ++) {
+            conn_fd = client_fds[i];
+            if (conn_fd < 0) {
+                continue;
+            }
+
+            if (FD_ISSET(conn_fd, &fds)) {
+                if (recv_message(&conn_fd) < 0) {
+                    FD_CLR(conn_fd, &fds);
+                    close(conn_fd);
+                    client_fds[i] = -1;
+                    continue;
                 }
             }
         }
