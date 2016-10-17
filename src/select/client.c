@@ -13,7 +13,7 @@ int recv_message(void *fd) {
     }
 
     buf[recv_len] = '\0';
-    printf("%s", buf);
+    printf("%s\n", buf);
     return 0;
 }
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in server_addr;
     fd_set fds;
     struct timeval tv;
-    char recv_line[MAX_LINE], send_line[MAX_LINE];
+    char send_line[MAX_LINE];
 
     tv.tv_sec = 3;
     tv.tv_usec = 0;
@@ -39,9 +39,14 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    flags = fcntl(socket_fd, F_GETFL);
-    if (fcntl(socket_fd, F_SETFL, flags|O_NONBLOCK) < 0) {
-        perror("fcntl error");
+    // set socket with non block
+    if ((flags = fcntl(socket_fd, F_GETFL)) < 0) {
+        perror("F_GETFL error");
+        exit(1);
+    }
+
+    if (fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+        perror("F_SETFL error");
         exit(1);
     }
 
@@ -84,7 +89,7 @@ int main(int argc, char *argv[])
         }
 
         if (FD_ISSET(stdin_fp, &fds)) {
-            if (fgets(send_line, sizeof(MAX_LINE), stdin) != NULL) {
+            if (fgets(send_line, MAX_LINE, stdin) != NULL) {
                 send_line[strlen(send_line) - 1] = '\0';
                 write(socket_fd, send_line, strlen(send_line));
             }

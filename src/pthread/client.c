@@ -14,7 +14,7 @@ void *recv_message(void *fd) {
 
         buf[recv_len] = '\0';
 
-        printf("%s", buf);
+        printf("%s\n", buf);
     }
 
     close(socket_fd);
