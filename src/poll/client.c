@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
             if ((send_len = read(fds[1].fd, send_message, MAX_LINE)) > 0) {
                 if (memcmp(send_message, "exit\n", send_len) == 0) {
                     printf("bye.\n");
-                    exit(0);
+                    break;
                 }
                 send_message[send_len - 1] = '\0';
                 write(socket_fd, send_message, send_len);

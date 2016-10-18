@@ -20,7 +20,7 @@ int recv_message(void *fd) {
 
 int main(int argc, char *argv[])
 {
-    int socket_fd, reval, stdin_fp = fileno(stdin), maxfd, flags;
+    int socket_fd, reval, maxfd, flags, send_len;
     struct sockaddr_in server_addr;
     fd_set fds;
     struct timeval tv;
@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
 
     for ( ; ; ) {
         FD_ZERO(&fds);
-        FD_SET(stdin_fp, &fds);
+        FD_SET(STDIN_FILENO, &fds);
         FD_SET(socket_fd, &fds);
 
-        maxfd = stdin_fp > socket_fd ? stdin_fp + 1 : socket_fd + 1;
+        maxfd = STDIN_FILENO > socket_fd ? STDIN_FILENO + 1 : socket_fd + 1;
 
         if ((reval = select(maxfd, &fds, NULL, NULL, &tv)) < 0) {
             perror("select error");
@@ -88,10 +88,14 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (FD_ISSET(stdin_fp, &fds)) {
-            if (fgets(send_line, MAX_LINE, stdin) != NULL) {
-                send_line[strlen(send_line) - 1] = '\0';
-                write(socket_fd, send_line, strlen(send_line));
+        if (FD_ISSET(STDIN_FILENO, &fds)) {
+            if ((send_len = read(STDIN_FILENO, send_line, MAX_LINE)) > 0) {
+                if (memcmp(send_line, "exit\n", send_len) == 0) {
+                    printf("bye.\n");
+                    break;
+                }
+                send_line[send_len - 1] = '\0';
+                write(socket_fd, send_line, send_len);
             }
         }
     }
