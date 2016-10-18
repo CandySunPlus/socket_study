@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
                     perror("accept error");
                     exit(1);
                 }
+                printf("accept new client:%s:%d\n", inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
                 EV_SET(changes, conn_fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
                 if (kevent(kq, changes, 1, NULL, 0, NULL) < 0) {
                     perror("kevent error");
