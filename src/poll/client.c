@@ -30,11 +30,13 @@ int recv_message(void *fd) {
     char buf[MAX_LINE];
     memset(buf, 0, MAX_LINE);
 
-    if ((recv_len = recv(socket_fd, buf, MAX_LINE, 0)) == -1) {
-        perror("receive error");
+    if ((recv_len = read(socket_fd, buf, MAX_LINE)) < 0) {
+        perror("receive error.");
+        return -1;
+    } else if (recv_len == 0) {
+        printf("server has been closed.\n");
         return -1;
     }
-
     buf[recv_len] = '\0';
     printf("%s\n", buf);
     return 0;
